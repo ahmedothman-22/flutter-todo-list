@@ -75,10 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 8.h,
                         children: [
-                          Text(
-                            'First Name',
-                            style: AppTextStyles.font14Regular,
-                          ),
+                          Text('First Name', style: AppTextStyles.font14Regular),
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.43,
                             child: AppTextFormField(
@@ -113,12 +110,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     maxLines: 1,
                     hintText: 'Email',
                     validator: (value) => AppValidators.email(value),
-                    prefixIcon: Icon(
-                      Icons.email,
-                      size: 20.sp,
-                      color: DarkAppColors.primary800,
-                    ),
-                    focusNode: passwordFocusNode,
+                    prefixIcon: Icon(Icons.email, size: 20.sp, color: DarkAppColors.primary800),
                     controller: emailController,
                   ),
                   Text('Password', style: AppTextStyles.font14Regular),
@@ -128,22 +120,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     hintText: 'Password',
                     validator: (value) => AppValidators.password(value),
                     suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isPasswordShown = !isPasswordShown;
-                        });
-                      },
-                      icon: Icon(
-                        isPasswordShown ? Icons.visibility : Icons.visibility_off,
-                        color: colorScheme.secondary,
-                      ),
+                      onPressed: () => setState(() => isPasswordShown = !isPasswordShown),
+                      icon: Icon(isPasswordShown ? Icons.visibility : Icons.visibility_off, color: colorScheme.secondary),
                     ),
-                    prefixIcon: Icon(
-                      Icons.lock_outlined,
-                      size: 20.sp,
-                      color: DarkAppColors.primary800,
-                    ),
-                    focusNode: confirmpasswordFocusNode,
+                    prefixIcon: Icon(Icons.lock_outlined, size: 20.sp, color: DarkAppColors.primary800),
                     controller: passwordController,
                   ),
                   Text('Confirm Password', style: AppTextStyles.font14Regular),
@@ -151,26 +131,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     maxLines: 1,
                     isObscureText: isConfirmPasswordShown,
                     hintText: 'Confirm Password',
-                    validator: (value) => AppValidators.confirmPassword(
-                      value,
-                      passwordController.text,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.lock_outlined,
-                      size: 20.sp,
-                      color: DarkAppColors.primary800,
-                    ),
+                    validator: (value) => AppValidators.confirmPassword(value, passwordController.text),
+                    prefixIcon: Icon(Icons.lock_outlined, size: 20.sp, color: DarkAppColors.primary800),
                     controller: confirmPasswordController,
                     suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isConfirmPasswordShown = !isConfirmPasswordShown;
-                        });
-                      },
-                      icon: Icon(
-                        isConfirmPasswordShown ? Icons.visibility : Icons.visibility_off,
-                        color: colorScheme.secondary,
-                      ),
+                      onPressed: () => setState(() => isConfirmPasswordShown = !isConfirmPasswordShown),
+                      icon: Icon(isConfirmPasswordShown ? Icons.visibility : Icons.visibility_off, color: colorScheme.secondary),
                     ),
                   ),
                   SizedBox(height: 10.h),
@@ -182,15 +148,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ? null
                         : () async {
                             if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                isLoading = true;
-                              });
-
+                              setState(() => isLoading = true);
                               try {
                                 UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
                                   email: emailController.text.trim(),
                                   password: passwordController.text.trim(),
                                 );
+
+                                // السطر السحري اللي هيخلي الاسم يظهر في الـ IndexView
+                                String fullName = "${firstNameController.text.trim()} ${lastNameController.text.trim()}";
+                                await userCredential.user!.updateDisplayName(fullName);
+                                await userCredential.user!.reload();
 
                                 await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
                                   'firstName': firstNameController.text.trim(),
@@ -205,22 +173,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 }
                               } on FirebaseAuthException catch (e) {
                                 if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(e.message ?? 'Registration failed')),
-                                  );
-                                }
-                              } catch (e) {
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('An error occurred. Please try again.')),
-                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Registration failed')));
                                 }
                               } finally {
-                                if (mounted) {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
+                                if (mounted) setState(() => isLoading = false);
                               }
                             }
                           },
@@ -231,34 +187,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   CustomButtonSignupLogin(
                     image: 'google.svg',
                     text: 'Register with Google',
-                    color: Color(0xff000000),
+                    color: const Color(0xff000000),
                     width: MediaQuery.of(context).size.width,
                   ),
                   CustomButtonSignupLogin(
                     image: 'facebook.svg',
                     text: 'Register with Facebook',
-                    color: Color(0xff000000),
+                    color: const Color(0xff000000),
                     width: MediaQuery.of(context).size.width,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'already have an account ?',
-                        style: AppTextStyles.font12Regular.copyWith(
-                          color: textTheme.bodyMedium!.color,
-                        ),
-                      ),
+                      Text('already have an account ?', style: AppTextStyles.font12Regular.copyWith(color: textTheme.bodyMedium!.color)),
                       TextButton(
-                        onPressed: () {
-                          GoRouter.of(context).pushReplacement(Routes.loginView);
-                        },
-                        child: Text(
-                          '   Login',
-                          style: AppTextStyles.font14Regular.copyWith(
-                            color: DarkAppColors.primary800,
-                          ),
-                        ),
+                        onPressed: () => GoRouter.of(context).pushReplacement(Routes.loginView),
+                        child: Text('   Login', style: AppTextStyles.font14Regular.copyWith(color: DarkAppColors.primary800)),
                       ),
                     ],
                   ),

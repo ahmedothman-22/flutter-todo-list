@@ -10,4 +10,5 @@ class Routes {
   static final String homeview = '/homeview';
   static const String appSetting = '/appSetting';
   static const String taskediting = '/taskediting';
+  static const String chatbot = '/chatbot';
 }

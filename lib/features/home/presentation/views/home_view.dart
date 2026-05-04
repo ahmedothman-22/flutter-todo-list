@@ -15,7 +15,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int currentIndex = 0;
-  List<Widget> tabs = [IndexView(), CalanderView(), ProfileView()];
+  final List<Widget> tabs = const [IndexView(), CalanderView(), ProfileView()];
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +31,13 @@ class _HomeViewState extends State<HomeView> {
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
                         top: Radius.circular(16.0),
                       ),
                     ),
                     builder: (context) {
-                      return AddTasksBottomSheet();
+                      return const AddTasksBottomSheet();
                     },
                   );
                 },
@@ -62,7 +62,7 @@ class _HomeViewState extends State<HomeView> {
           elevation: 0,
           showUnselectedLabels: true,
           showSelectedLabels: true,
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined, size: 24),
               label: 'Home',
