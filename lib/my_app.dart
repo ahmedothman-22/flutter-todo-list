@@ -15,13 +15,10 @@ class MyApp extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-
           // Set the app theme
           theme: getDarkTheme(context),
           darkTheme: getDarkTheme(context),
-
           locale: const Locale('en'),
-
           // Set the initial route based on user authentication and role
           routerConfig: AppRouter.router,
         );

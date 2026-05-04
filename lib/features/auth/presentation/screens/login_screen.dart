@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -26,11 +27,13 @@ class _LoginScreenState extends State<LoginScreen> {
   String? email;
   String? password;
   bool isshown = true;
+  bool isLoading = false;
 
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -129,20 +132,49 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 CustomButton(
-                  onTap: () async {
-                    if (_formkey.currentState!.validate()) {
-                      GoRouter.of(context).pushReplacement(Routes.homeview);
-                    }
-                  },
-                  text: 'Login',
+                  onTap: isLoading
+                      ? null
+                      : () async {
+                          if (_formkey.currentState!.validate()) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            try {
+                              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              );
+                              if (mounted) {
+                                GoRouter.of(context).pushReplacement(Routes.homeview);
+                              }
+                            } on FirebaseAuthException catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.message ?? 'Login failed')),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('An error occurred. Please try again.')),
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            }
+                          }
+                        },
+                  text: isLoading ? 'Logging in...' : 'Login',
                 ),
                 SizedBox(height: 10.h),
                 CustomDevider(),
                 SizedBox(height: 10.h),
                 CustomButtonSignupLogin(
-                  onTap: () async {
-                    // LoginMethods.signInWithGoogle(context);
-                  },
+                  onTap: () async {},
                   image: 'google.svg',
                   text: 'Login with Google',
                   color: Color(0xff000000),
@@ -164,9 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        GoRouter.of(
-                          context,
-                        ).pushReplacement(Routes.registerView);
+                        GoRouter.of(context).pushReplacement(Routes.registerView);
                       },
                       child: Text(
                         '   Register',

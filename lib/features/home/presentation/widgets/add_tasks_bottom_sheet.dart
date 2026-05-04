@@ -3,9 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tadweer/core/theme/app_colors/dark_app_colors.dart';
 import 'package:tadweer/core/theme/app_texts/app_text_styles.dart';
 import 'package:tadweer/core/widgets/custom_button.dart';
-import 'package:tadweer/features/home/models/task_model.dart';
 import 'package:tadweer/features/home/presentation/widgets/select_date_category.dart';
 import '../../../../core/widgets/custom_text_form_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddTasksBottomSheet extends StatefulWidget {
   const AddTasksBottomSheet({super.key});
@@ -46,7 +47,7 @@ class _AddTasksBottomSheetState extends State<AddTasksBottomSheet> {
             topRight: Radius.circular(20.r),
           ),
         ),
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -97,22 +98,42 @@ class _AddTasksBottomSheetState extends State<AddTasksBottomSheet> {
                     ? null
                     : () async {
                         if (_formKey.currentState!.validate()) {
-                          final newTask = TaskModel(
-                            name: taskNamecontroller.text.trim(),
-                            details: taskDetailscontroller.text.trim(),
-                            date: selectedDate ?? DateTime.now(),
-                            category: selectedCategory,
-                          );
                           setState(() {
                             isLoading = true;
                           });
-                          Navigator.pop(context);
-                          setState(() {
-                            isLoading = false;
-                          });
+
+                          try {
+                            final String uid = FirebaseAuth.instance.currentUser!.uid;
+                            var newDocRef = FirebaseFirestore.instance.collection('tasks').doc();
+                            
+                            Map<String, dynamic> taskData = {
+                              'id': newDocRef.id,
+                              'userId': uid,
+                              'name': taskNamecontroller.text.trim(),
+                              'details': taskDetailscontroller.text.trim(),
+                              'date': Timestamp.fromDate(selectedDate ?? DateTime.now()),
+                              'category': selectedCategory.isEmpty ? 'General' : selectedCategory, 
+                              'isDone': false,
+                              'createdAt': FieldValue.serverTimestamp(),
+                            };
+
+                            await newDocRef.set(taskData);
+
+                            if (mounted) {
+                              Navigator.pop(context);
+                            }
+                          } catch (error) {
+                            debugPrint("Error: $error");
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          }
                         }
                       },
-                text: isLoading ? 'Loading' : 'Add Task',
+                text: isLoading ? 'Loading...' : 'Add Task',
                 color: DarkAppColors.primary800,
                 width: MediaQuery.of(context).size.width,
               ),

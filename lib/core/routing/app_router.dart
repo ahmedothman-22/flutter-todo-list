@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tadweer/core/routing/routes.dart';
 import 'package:tadweer/features/auth/presentation/screens/email_verified_screen.dart';
@@ -16,6 +17,29 @@ abstract class AppRouter {
   static void initRouter() {
     router = GoRouter(
       initialLocation: Routes.splash,
+      
+      redirect: (context, state) {
+        final user = FirebaseAuth.instance.currentUser;
+        final bool isLoggedIn = user != null;
+
+        final bool isAuthOrSplashPath = state.matchedLocation == Routes.loginView ||
+            state.matchedLocation == Routes.registerView ||
+            state.matchedLocation == Routes.forgetpasssword ||
+            state.matchedLocation == Routes.splash ||
+            state.matchedLocation == Routes.onboarding;
+
+        final bool isProtectedPath = state.matchedLocation == Routes.homeview ||
+            state.matchedLocation == Routes.taskediting;
+
+        if (!isLoggedIn && isProtectedPath) {
+          return Routes.loginView;
+        }
+        if (isLoggedIn && isAuthOrSplashPath) {
+          return Routes.homeview;
+        }
+
+        return null; 
+      },
       routes: [
         GoRoute(
           path: Routes.splash,

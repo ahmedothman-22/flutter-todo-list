@@ -89,7 +89,13 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset(page["image"]!),
+                      // 🔹 التعديل هنا: حطينا الصورة جوه Expanded وحطينا fit
+                      Expanded(
+                        child: Image.asset(
+                          page["image"]!,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                       SizedBox(height: 20.h),
                       Text(
                         page["title"]!,

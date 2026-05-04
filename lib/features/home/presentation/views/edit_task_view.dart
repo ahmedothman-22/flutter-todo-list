@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -24,6 +25,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
   late TextEditingController categoryController;
   late DateTime selectedDate;
   late bool isDone;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -76,7 +78,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           icon: Icon(Icons.arrow_back_ios, color: colorScheme.secondary),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,8 +93,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             AppTextFormField(
               hintText: 'Task Name',
               validator: (value) {
-                if (value == null) {
-                  Text('The field is required');
+                if (value == null || value.isEmpty) {
+                  return 'The field is required';
                 }
                 return null;
               },
@@ -107,8 +109,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             AppTextFormField(
               hintText: 'Task Details',
               validator: (value) {
-                if (value == null) {
-                  Text('The field is required');
+                if (value == null || value.isEmpty) {
+                  return 'The field is required';
                 }
                 return null;
               },
@@ -123,8 +125,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
             AppTextFormField(
               hintText: 'Task Category',
               validator: (value) {
-                if (value == null) {
-                  Text('The field is required');
+                if (value == null || value.isEmpty) {
+                  return 'The field is required';
                 }
                 return null;
               },
@@ -158,7 +160,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 const Spacer(),
                 TextButton(
                   onPressed: () => _pickDate(context),
-                  child: Text('Change Date'),
+                  child: const Text('Change Date'),
                 ),
               ],
             ),
@@ -176,7 +178,6 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                   activeColor: DarkAppColors.primary800,
                   inactiveThumbColor: colorScheme.secondary,
                   inactiveTrackColor: Colors.grey,
-
                   onChanged: (value) {
                     setState(() {
                       isDone = value;
@@ -185,21 +186,43 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 ),
               ],
             ),
-            Spacer(),
+            SizedBox(height: 40.h),
             CustomButton(
               width: double.infinity,
               color: DarkAppColors.primary800,
-              onTap: () async {
-                final updatedTask = TaskModel(
-                  id: widget.task.id,
-                  name: nameController.text,
-                  details: detailsController.text,
-                  category: categoryController.text,
-                  date: selectedDate,
-                  isDone: isDone,
-                );
-              },
-              text: 'Save Changes',
+              onTap: isLoading
+                  ? null
+                  : () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      try {
+                        await FirebaseFirestore.instance
+                            .collection('tasks')
+                            .doc(widget.task.id)
+                            .update({
+                              'name': nameController.text.trim(),
+                              'details': detailsController.text.trim(),
+                              'category': categoryController.text.trim(),
+                              'date': Timestamp.fromDate(selectedDate),
+                              'isDone': isDone,
+                            });
+
+                        if (mounted) {
+                          GoRouter.of(context).pushReplacement(Routes.homeview);
+                        }
+                      } catch (error) {
+                        print("Error updating task: $error");
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    },
+              text: isLoading ? 'Saving...' : 'Save Changes',
             ),
           ],
         ),
