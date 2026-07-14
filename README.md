@@ -1,16 +1,17 @@
-# Tadweer
+# Flutter To-Do List App (OS2 Project)
 
-A new Flutter project.
+This is a cross-platform mobile application developed using **Flutter** and **Dart** as a practical course project for the **Operating Systems 2 (OS2)** class. 
 
-## Getting Started
+## 📌 Project Overview
+The project is a clean, responsive **To-Do List** application designed to help users manage their daily tasks efficiently. While it serves as a practical task manager, it was built to demonstrate core concepts aligned with our academic coursework in OS2.
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
+* **Task Management:** Create, update, and delete tasks.
+* **Modern UI:** Clean, intuitive user interface built with Flutter.
+* **State Management:** Efficient state handling to ensure a smooth user experience.
+* **Data Persistence:** Tasks are saved locally on the device (so they don't disappear when you close the app).
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Technologies Used
+* **Framework:** Flutter
+* **Language:** Dart
+* **OS Concept Focus:** Process scheduling/task management simulation concepts.
