@@ -3,7 +3,7 @@
 **Tadweer** is a creative and efficient To-Do application built with **Flutter**, designed to help you manage your daily tasks with clarity and ease. 
 
 > 💡 **What is "Tadweer"?**
-> The name **"Tadweer" (تدوير)** means *"cycle"* or *"rotation"* in Arabic. Since productivity is a continuous loop of planning, executing, and reviewing, **Tadweer** helps you keep that cycle going smoothly.
+> The name **"Tadweer"** means *"cycle"* or *"rotation"* in Arabic. Since productivity is a continuous loop of planning, executing, and reviewing, **Tadweer** helps you keep that cycle going smoothly.
 
 *This project was developed as a practical course project for the **Operating Systems 2 (OS2)** class, showcasing modern mobile development practices, state management, and cloud integration.*
 
